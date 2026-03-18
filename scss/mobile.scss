@@ -1,0 +1,13 @@
+// Mobile overrides
+.fv-timeline-wrap {
+  padding: 10px 12px;
+  margin: 0 0 10px;
+}
+
+.fv-tl-range {
+  display: none; // hide date range on small screens
+}
+
+.fv-tl-card {
+  max-width: 100%;
+}

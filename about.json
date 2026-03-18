@@ -1,0 +1,7 @@
+{
+  "name": "Family Vault",
+  "about_url": "https://family-vault.org",
+  "component": true,
+  "minimum_discourse_version": "3.0.0",
+  "authors": "Mick"
+}

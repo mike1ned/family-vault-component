@@ -1,0 +1,317 @@
+// ==========================================
+// Family Vault Component — Shared Styles
+// ==========================================
+
+// --- Palette ---
+$fv-midnight:    #0F1E36;
+$fv-navy:        #1B2A4A;
+$fv-slate:       #2E4470;
+$fv-fog:         #D1D9E6;
+$fv-amber:       #E8A040;
+$fv-gold:        #C47D18;
+$fv-cream:       #FAF6EE;
+$fv-linen:       #F0E8D8;
+$fv-sage:        #5E8A6E;
+$fv-sage-light:  #A8C9B2;
+$fv-body-text:   #3D4A5C;
+$fv-white:       #FFFFFF;
+
+// ==========================================
+// Timeline
+// ==========================================
+.fv-timeline-wrap {
+  position: relative;
+  background: $fv-white;
+  border: 1px solid $fv-fog;
+  border-radius: 12px;
+  padding: 14px 24px 14px;
+  margin: 0 0 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.fv-tl-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.fv-tl-title {
+  font-family: 'Fraunces', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: $fv-navy;
+  letter-spacing: 0.02em;
+}
+
+.fv-tl-range {
+  position: absolute;
+  right: 0;
+  font-size: 11px;
+  color: rgba(61, 74, 92, 0.4);
+  font-weight: 500;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.fv-tl-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fv-tl-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.fv-tl-btn {
+  background: $fv-cream;
+  border: 1px solid $fv-fog;
+  border-radius: 8px;
+  width: 44px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: $fv-slate;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: $fv-fog;
+    color: $fv-navy;
+  }
+}
+
+.fv-tl-line-wrap {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 10px 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.fv-tl-line {
+  position: relative;
+  height: 4px;
+  background: $fv-fog;
+  border-radius: 2px;
+  min-width: 100%;
+  margin: 0 8px;
+}
+
+.fv-tl-today {
+  position: absolute;
+  width: 2px;
+  height: 24px;
+  background: $fv-sage;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  border-radius: 1px;
+}
+
+.fv-tl-today-label {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-weight: 700;
+  color: $fv-sage;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  white-space: nowrap;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.fv-tl-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: $fv-amber;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid $fv-white;
+  z-index: 1;
+
+  &:hover {
+    transform: translate(-50%, -50%) scale(1.5);
+    box-shadow: 0 2px 10px rgba(232, 160, 64, 0.5);
+  }
+
+  &.fv-tl-dot--capsule {
+    background: #7C6BC4;
+    &:hover { box-shadow: 0 2px 10px rgba(124, 107, 196, 0.5); }
+  }
+
+  &.fv-tl-dot--active {
+    transform: translate(-50%, -50%) scale(1.5);
+    box-shadow: 0 0 0 3px rgba(232, 160, 64, 0.2);
+
+    &.fv-tl-dot--capsule {
+      box-shadow: 0 0 0 3px rgba(124, 107, 196, 0.2);
+    }
+  }
+}
+
+.fv-tl-preview {
+  margin-top: 2px;
+  display: flex;
+  justify-content: flex-end;
+  animation: fv-fade-in 0.2s ease;
+}
+
+.fv-tl-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: $fv-cream;
+  border: 1px solid $fv-fog;
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-width: 320px;
+}
+
+.fv-tl-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fv-tl-card-type {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.fv-tl-card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: $fv-navy;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fv-tl-card-date {
+  font-size: 11px;
+  color: rgba(61, 74, 92, 0.5);
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.fv-tl-card-open {
+  background: $fv-amber;
+  color: $fv-white;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: 'DM Sans', system-ui, sans-serif;
+
+  &:hover {
+    background: $fv-gold;
+    color: $fv-white;
+  }
+}
+
+// ==========================================
+// Memory Banner (on topic pages)
+// ==========================================
+.fv-memory-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin: 0 0 12px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+
+  &.fv-banner--past {
+    background: linear-gradient(135deg, #FFF8EB, #FFF1D6);
+    border-left: 4px solid $fv-amber;
+  }
+
+  &.fv-banner--future {
+    background: linear-gradient(135deg, #F0E8FF, #E8DFFF);
+    border-left: 4px solid #7C6BC4;
+  }
+
+  &.fv-banner--today {
+    background: linear-gradient(135deg, #E8F5EE, #D6EDDF);
+    border-left: 4px solid $fv-sage;
+  }
+}
+
+.fv-banner-icon {
+  font-size: 18px;
+}
+
+.fv-banner-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+  color: $fv-slate;
+}
+
+.fv-banner-date {
+  color: $fv-body-text;
+  font-weight: 500;
+}
+
+// ==========================================
+// Memory Creator Button
+// ==========================================
+.fv-create-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 12px;
+  background: $fv-amber;
+  color: $fv-white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+
+  &:hover {
+    background: $fv-gold;
+  }
+}
+
+// ==========================================
+// Animation
+// ==========================================
+@keyframes fv-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
