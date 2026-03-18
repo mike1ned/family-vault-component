@@ -23,6 +23,15 @@ export default class FvTimeline extends Component {
     await this.fvData.loadEntries();
     this.entries = [...this.fvData.allEntries];
     this.loaded = true;
+
+    // Move timeline to top of main content area
+    requestAnimationFrame(() => {
+      const el = document.querySelector(".fv-timeline-wrap");
+      const target = document.querySelector("#main-outlet .container");
+      if (el && target && !target.contains(el)) {
+        target.prepend(el);
+      }
+    });
   }
 
   get hasEntries() {
