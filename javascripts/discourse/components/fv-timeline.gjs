@@ -21,7 +21,7 @@ export default class FvTimeline extends Component {
 
   async loadData() {
     await this.fvData.loadEntries();
-    this.entries = this.fvData.allEntries;
+    this.entries = [...this.fvData.allEntries];
     this.loaded = true;
   }
 
