@@ -2,6 +2,18 @@
 // Family Vault Component — Shared Styles
 // ==========================================
 
+// Force timeline to top of main-outlet using flexbox ordering
+#main-outlet-wrapper,
+#main-outlet {
+  display: flex;
+  flex-direction: column;
+}
+
+// The before-main-outlet connector wrapper
+.before-main-outlet-outlet {
+  order: -1;
+}
+
 // --- Palette ---
 $fv-midnight:    #0F1E36;
 $fv-navy:        #1B2A4A;
