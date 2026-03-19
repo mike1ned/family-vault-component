@@ -10,28 +10,24 @@ export default class FvTimeline extends Component {
   @service fvData;
 
   @tracked entries = [];
-  @tracked currentIndex = -1;
-  @tracked previewEntry = null;
+  @tracked selectedIndex = -1; // -1 means "on today"
   @tracked loaded = false;
+  _resetTimer = null;
 
   constructor() {
     super(...arguments);
     this.loadData();
   }
 
+  willDestroy() {
+    super.willDestroy(...arguments);
+    if (this._resetTimer) clearTimeout(this._resetTimer);
+  }
+
   async loadData() {
     await this.fvData.loadEntries();
     this.entries = [...this.fvData.allEntries];
     this.loaded = true;
-
-    // Move timeline to top of main content area
-    requestAnimationFrame(() => {
-      const el = document.querySelector(".fv-timeline-wrap");
-      const target = document.querySelector("#main-outlet .container");
-      if (el && target && !target.contains(el)) {
-        target.prepend(el);
-      }
-    });
   }
 
   get hasEntries() {
@@ -70,24 +66,41 @@ export default class FvTimeline extends Component {
     return `${s[this.minDate.getMonth()]} ${this.minDate.getFullYear()}  —  ${s[this.maxDate.getMonth()]} ${this.maxDate.getFullYear()}`;
   }
 
+  get todayPct() {
+    return this.pct(this.today);
+  }
+
   get todayStyle() {
-    return htmlSafe(`left: ${this.pct(this.today)}%`);
+    return htmlSafe(`left: ${this.todayPct}%`);
+  }
+
+  // Green selector dot position — on today or on the selected entry
+  get selectorStyle() {
+    const idx = this.selectedIndex;
+    if (idx < 0 || idx >= this.entries.length) {
+      return htmlSafe(`left: ${this.todayPct}%`);
+    }
+    const d = new Date(this.entries[idx].memoryDate + "T12:00:00");
+    return htmlSafe(`left: ${this.pct(d)}%`);
+  }
+
+  get isOnToday() {
+    return this.selectedIndex < 0;
   }
 
   get dots() {
-    const activeIdx = this.currentIndex;
     return this.entries.map((entry, idx) => ({
       entry,
       idx,
       style: htmlSafe(`left: ${this.pct(new Date(entry.memoryDate + "T12:00:00"))}%`),
       isCapsule: entry.categoryId === this.fvData.capsulesCategoryId,
-      isActive: idx === activeIdx,
     }));
   }
 
   get previewCard() {
-    if (!this.previewEntry) return null;
-    const e = this.previewEntry;
+    const idx = this.selectedIndex;
+    if (idx < 0 || idx >= this.entries.length) return null;
+    const e = this.entries[idx];
     const isCapsule = e.categoryId === this.fvData.capsulesCategoryId;
     return {
       type: isCapsule ? "\u23F3 Time Capsule" : this.fvData.typeIcon(e.memoryType) + " " + (e.memoryType || "Memory"),
@@ -98,21 +111,30 @@ export default class FvTimeline extends Component {
     };
   }
 
+  _startResetTimer() {
+    if (this._resetTimer) clearTimeout(this._resetTimer);
+    this._resetTimer = setTimeout(() => {
+      this.selectedIndex = -1;
+    }, 5000);
+  }
+
   @action
   selectDot(idx) {
     if (idx < 0 || idx >= this.entries.length) return;
-    this.currentIndex = idx;
-    this.previewEntry = this.entries[idx];
+    this.selectedIndex = idx;
+    this._startResetTimer();
   }
 
   @action
   prevDot() {
-    this.selectDot(this.currentIndex <= 0 ? 0 : this.currentIndex - 1);
+    const idx = this.selectedIndex <= 0 ? 0 : this.selectedIndex - 1;
+    this.selectDot(idx);
   }
 
   @action
   nextDot() {
-    this.selectDot(this.currentIndex < 0 ? 0 : Math.min(this.currentIndex + 1, this.entries.length - 1));
+    const next = this.selectedIndex < 0 ? 0 : Math.min(this.selectedIndex + 1, this.entries.length - 1);
+    this.selectDot(next);
   }
 
   <template>
@@ -129,18 +151,22 @@ export default class FvTimeline extends Component {
           </div>
           <div class="fv-tl-line-wrap">
             <div class="fv-tl-line">
+              {{!-- Today marker line --}}
               <div class="fv-tl-today" style={{this.todayStyle}}>
                 <span class="fv-tl-today-label">TODAY</span>
               </div>
+              {{!-- Entry dots (amber/purple) --}}
               {{#each this.dots as |dot|}}
                 <div
-                  class="fv-tl-dot {{if dot.isCapsule 'fv-tl-dot--capsule'}} {{if dot.isActive 'fv-tl-dot--active'}}"
+                  class="fv-tl-dot {{if dot.isCapsule 'fv-tl-dot--capsule'}}"
                   style={{dot.style}}
                   title={{dot.entry.title}}
                   role="button"
                   {{on "click" (fn this.selectDot dot.idx)}}
                 ></div>
               {{/each}}
+              {{!-- Green selector dot --}}
+              <div class="fv-tl-selector {{if this.isOnToday 'fv-tl-selector--today'}}" style={{this.selectorStyle}}></div>
             </div>
           </div>
         </div>

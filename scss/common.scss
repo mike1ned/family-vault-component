@@ -172,21 +172,32 @@ $fv-white:       #FFFFFF;
     &:hover { box-shadow: 0 2px 10px rgba(124, 107, 196, 0.5); }
   }
 
-  &.fv-tl-dot--active {
-    transform: translate(-50%, -50%) scale(1.5);
-    box-shadow: 0 0 0 3px rgba(232, 160, 64, 0.2);
+}
 
-    &.fv-tl-dot--capsule {
-      box-shadow: 0 0 0 3px rgba(124, 107, 196, 0.2);
-    }
+// Green selector dot — sits on TODAY by default, moves to selected entry
+.fv-tl-selector {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: $fv-sage;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  border: 2px solid $fv-white;
+  box-shadow: 0 0 0 3px rgba(94, 138, 110, 0.25);
+  transition: left 0.4s ease, box-shadow 0.3s ease;
+  pointer-events: none;
+
+  &.fv-tl-selector--today {
+    box-shadow: 0 0 0 4px rgba(94, 138, 110, 0.15), 0 0 8px rgba(94, 138, 110, 0.2);
   }
 }
 
 .fv-tl-preview {
   margin-top: 2px;
   display: flex;
-  justify-content: flex-start;
-  padding-left: 54px; // align with timeline line (past nav buttons)
+  justify-content: flex-end;
   animation: fv-fade-in 0.2s ease;
 }
 
