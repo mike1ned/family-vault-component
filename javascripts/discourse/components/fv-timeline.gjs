@@ -115,7 +115,7 @@ export default class FvTimeline extends Component {
     if (this._resetTimer) clearTimeout(this._resetTimer);
     this._resetTimer = setTimeout(() => {
       this.selectedIndex = -1;
-    }, 5000);
+    }, 7000);
   }
 
   @action
