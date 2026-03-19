@@ -2,9 +2,9 @@ import Service from "@ember/service";
 import { service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
 
-const MEMORIES_CATEGORY_ID = 30;
-const CAPSULES_CATEGORY_ID = 31;
-const TIMELINE_CATEGORY_ID = 26;
+const MEMORIES_CATEGORY_ID = 53; // The Past
+const CAPSULES_CATEGORY_ID = 55; // The Future
+const TIMELINE_CATEGORY_ID = 54; // The Present
 const CACHE_TTL = 5 * 60 * 1000; // 5 min
 
 export default class FvDataService extends Service {
