@@ -75,12 +75,13 @@ export default class FvTimeline extends Component {
   }
 
   get dots() {
+    const activeIdx = this.currentIndex;
     return this.entries.map((entry, idx) => ({
       entry,
       idx,
       style: htmlSafe(`left: ${this.pct(new Date(entry.memoryDate + "T12:00:00"))}%`),
       isCapsule: entry.categoryId === this.fvData.capsulesCategoryId,
-      isActive: idx === this.currentIndex,
+      isActive: idx === activeIdx,
     }));
   }
 

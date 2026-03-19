@@ -185,7 +185,8 @@ $fv-white:       #FFFFFF;
 .fv-tl-preview {
   margin-top: 2px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  padding-left: 54px; // align with timeline line (past nav buttons)
   animation: fv-fade-in 0.2s ease;
 }
 
