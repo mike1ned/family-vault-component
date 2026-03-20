@@ -102,11 +102,15 @@ export default class FvTimeline extends Component {
     if (idx < 0 || idx >= entries.length) return null;
     const e = entries[idx];
     const isCapsule = e.categoryId === this.fvData.capsulesCategoryId;
+    // Count how many entries share this date, and which position this one is
+    const sameDate = entries.filter((x) => x.memoryDate === e.memoryDate);
+    const posInGroup = sameDate.findIndex((x) => x.id === e.id) + 1;
+    const groupLabel = sameDate.length > 1 ? ` (${posInGroup} of ${sameDate.length})` : "";
     return {
       type: isCapsule ? "\u23F3 Time Capsule" : this.fvData.typeIcon(e.memoryType) + " " + (e.memoryType || "Memory"),
       typeStyle: htmlSafe(`color: ${isCapsule ? "#7C6BC4" : "#E8A040"}`),
       title: e.title,
-      date: this.fvData.formatDateLong(new Date(e.memoryDate + "T12:00:00")),
+      date: this.fvData.formatDateLong(new Date(e.memoryDate + "T12:00:00")) + groupLabel,
       url: `/t/${e.slug}/${e.id}`,
     };
   }
@@ -126,7 +130,7 @@ export default class FvTimeline extends Component {
     this._startResetTimer();
   }
 
-  // Single button: cycles today → next unique-date entry → ... → last → today → repeat
+  // Single button: TODAY → Date A (1 of 3) → Date A (2 of 3) → Date A (3 of 3) → Date B → ...
   @action
   advanceDot() {
     const entries = this.fvData.allEntries;
@@ -140,15 +144,8 @@ export default class FvTimeline extends Component {
         this._resetTimer = null;
       }
     } else {
-      // Skip past any entries that share the same date as the current position
-      const currentDate = this.selectedIndex < 0
-        ? null
-        : entries[this.selectedIndex].memoryDate;
-      let next = this.selectedIndex + 1;
-      while (next < count - 1 && entries[next].memoryDate === currentDate) {
-        next++;
-      }
-      this.selectedIndex = next;
+      // Always advance by exactly one — every entry gets its turn
+      this.selectedIndex = this.selectedIndex + 1;
       this._startResetTimer();
     }
   }
