@@ -28,17 +28,8 @@ export default class FvTimeline extends Component {
     this.loaded = true;
   }
 
-  // Always read entries from the service — no stale copy
-  get entries() {
-    return this.fvData.allEntries;
-  }
-
-  get entryCount() {
-    return this.entries.length;
-  }
-
   get hasEntries() {
-    return this.entryCount > 0;
+    return this.fvData.allEntries.length > 0;
   }
 
   get today() {
@@ -48,7 +39,8 @@ export default class FvTimeline extends Component {
   }
 
   get minDate() {
-    const dates = this.entries.map((e) => new Date(e.memoryDate + "T12:00:00"));
+    const entries = this.fvData.allEntries;
+    const dates = entries.map((e) => new Date(e.memoryDate + "T12:00:00"));
     const min = new Date(Math.min(...dates, this.today));
     min.setDate(min.getDate() - 30);
     return min;
@@ -81,14 +73,13 @@ export default class FvTimeline extends Component {
     return htmlSafe(`left: ${this.todayPct}%`);
   }
 
-  // Green selector dot position — on today or on the selected entry
   get selectorStyle() {
     const idx = this.selectedIndex;
-    const count = this.entryCount;
-    if (idx < 0 || idx >= count) {
+    const entries = this.fvData.allEntries;
+    if (idx < 0 || idx >= entries.length) {
       return htmlSafe(`left: ${this.todayPct}%`);
     }
-    const d = new Date(this.entries[idx].memoryDate + "T12:00:00");
+    const d = new Date(entries[idx].memoryDate + "T12:00:00");
     return htmlSafe(`left: ${this.pct(d)}%`);
   }
 
@@ -97,7 +88,7 @@ export default class FvTimeline extends Component {
   }
 
   get dots() {
-    return this.entries.map((entry, idx) => ({
+    return this.fvData.allEntries.map((entry, idx) => ({
       entry,
       idx,
       style: htmlSafe(`left: ${this.pct(new Date(entry.memoryDate + "T12:00:00"))}%`),
@@ -107,9 +98,9 @@ export default class FvTimeline extends Component {
 
   get previewCard() {
     const idx = this.selectedIndex;
-    const count = this.entryCount;
-    if (idx < 0 || idx >= count) return null;
-    const e = this.entries[idx];
+    const entries = this.fvData.allEntries;
+    if (idx < 0 || idx >= entries.length) return null;
+    const e = entries[idx];
     const isCapsule = e.categoryId === this.fvData.capsulesCategoryId;
     return {
       type: isCapsule ? "\u23F3 Time Capsule" : this.fvData.typeIcon(e.memoryType) + " " + (e.memoryType || "Memory"),
@@ -129,34 +120,30 @@ export default class FvTimeline extends Component {
 
   @action
   selectDot(idx) {
-    const count = this.entryCount;
-    if (count === 0) return;
-    // Clamp idx to valid range
-    const clamped = Math.max(0, Math.min(idx, count - 1));
-    this.selectedIndex = clamped;
+    const entries = this.fvData.allEntries;
+    if (entries.length === 0) return;
+    this.selectedIndex = Math.max(0, Math.min(idx, entries.length - 1));
     this._startResetTimer();
   }
 
+  // Single button: cycles today → 0 → 1 → ... → last → today → repeat
   @action
-  prevDot() {
-    if (this.selectedIndex <= 0) {
-      // If on today (-1) or first entry (0), go to first entry
-      this.selectDot(0);
+  advanceDot() {
+    const entries = this.fvData.allEntries;
+    const count = entries.length;
+    if (count === 0) return;
+    if (this.selectedIndex >= count - 1) {
+      // At last entry (or somehow beyond) — wrap back to today
+      this.selectedIndex = -1;
+      if (this._resetTimer) {
+        clearTimeout(this._resetTimer);
+        this._resetTimer = null;
+      }
     } else {
-      this.selectDot(this.selectedIndex - 1);
+      // Advance: -1 → 0 → 1 → 2 → ...
+      this.selectedIndex = this.selectedIndex + 1;
+      this._startResetTimer();
     }
-  }
-
-  @action
-  nextDot() {
-    const count = this.entryCount;
-    if (this.selectedIndex < 0) {
-      // On today — go to first entry
-      this.selectDot(0);
-    } else if (this.selectedIndex < count - 1) {
-      this.selectDot(this.selectedIndex + 1);
-    }
-    // If already at last entry, do nothing
   }
 
   <template>
@@ -168,12 +155,11 @@ export default class FvTimeline extends Component {
         </div>
         <div class="fv-tl-body">
           <div class="fv-tl-nav">
-            <button class="fv-tl-btn" type="button" {{on "click" this.nextDot}}>&#9650;</button>
-            <button class="fv-tl-btn" type="button" {{on "click" this.prevDot}}>&#9660;</button>
+            <button class="fv-tl-btn" type="button" {{on "click" this.advanceDot}}>&#9654;</button>
           </div>
           <div class="fv-tl-line-wrap">
             <div class="fv-tl-line">
-              {{!-- Today marker line --}}
+              {{!-- Today marker --}}
               <div class="fv-tl-today" style={{this.todayStyle}}>
                 <span class="fv-tl-today-label">TODAY</span>
               </div>
