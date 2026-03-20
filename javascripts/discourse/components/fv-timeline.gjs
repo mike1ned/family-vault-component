@@ -9,7 +9,6 @@ import { htmlSafe } from "@ember/template";
 export default class FvTimeline extends Component {
   @service fvData;
 
-  @tracked entries = [];
   @tracked selectedIndex = -1; // -1 means "on today"
   @tracked loaded = false;
   _resetTimer = null;
@@ -26,12 +25,20 @@ export default class FvTimeline extends Component {
 
   async loadData() {
     await this.fvData.loadEntries();
-    this.entries = [...this.fvData.allEntries];
     this.loaded = true;
   }
 
+  // Always read entries from the service — no stale copy
+  get entries() {
+    return this.fvData.allEntries;
+  }
+
+  get entryCount() {
+    return this.entries.length;
+  }
+
   get hasEntries() {
-    return this.entries.length > 0;
+    return this.entryCount > 0;
   }
 
   get today() {
@@ -77,7 +84,8 @@ export default class FvTimeline extends Component {
   // Green selector dot position — on today or on the selected entry
   get selectorStyle() {
     const idx = this.selectedIndex;
-    if (idx < 0 || idx >= this.entries.length) {
+    const count = this.entryCount;
+    if (idx < 0 || idx >= count) {
       return htmlSafe(`left: ${this.todayPct}%`);
     }
     const d = new Date(this.entries[idx].memoryDate + "T12:00:00");
@@ -99,7 +107,8 @@ export default class FvTimeline extends Component {
 
   get previewCard() {
     const idx = this.selectedIndex;
-    if (idx < 0 || idx >= this.entries.length) return null;
+    const count = this.entryCount;
+    if (idx < 0 || idx >= count) return null;
     const e = this.entries[idx];
     const isCapsule = e.categoryId === this.fvData.capsulesCategoryId;
     return {
@@ -120,21 +129,34 @@ export default class FvTimeline extends Component {
 
   @action
   selectDot(idx) {
-    if (idx < 0 || idx >= this.entries.length) return;
-    this.selectedIndex = idx;
+    const count = this.entryCount;
+    if (count === 0) return;
+    // Clamp idx to valid range
+    const clamped = Math.max(0, Math.min(idx, count - 1));
+    this.selectedIndex = clamped;
     this._startResetTimer();
   }
 
   @action
   prevDot() {
-    const idx = this.selectedIndex <= 0 ? 0 : this.selectedIndex - 1;
-    this.selectDot(idx);
+    if (this.selectedIndex <= 0) {
+      // If on today (-1) or first entry (0), go to first entry
+      this.selectDot(0);
+    } else {
+      this.selectDot(this.selectedIndex - 1);
+    }
   }
 
   @action
   nextDot() {
-    const next = this.selectedIndex < 0 ? 0 : Math.min(this.selectedIndex + 1, this.entries.length - 1);
-    this.selectDot(next);
+    const count = this.entryCount;
+    if (this.selectedIndex < 0) {
+      // On today — go to first entry
+      this.selectDot(0);
+    } else if (this.selectedIndex < count - 1) {
+      this.selectDot(this.selectedIndex + 1);
+    }
+    // If already at last entry, do nothing
   }
 
   <template>
