@@ -126,22 +126,31 @@ export default class FvTimeline extends Component {
     this._startResetTimer();
   }
 
-  // Single button: cycles today → 0 → 1 → ... → last → today → repeat
+  // Single button: cycles today → next visually distinct entry → ... → last → today → repeat
   @action
   advanceDot() {
     const entries = this.fvData.allEntries;
     const count = entries.length;
     if (count === 0) return;
     if (this.selectedIndex >= count - 1) {
-      // At last entry (or somehow beyond) — wrap back to today
+      // At last entry — wrap back to today
       this.selectedIndex = -1;
       if (this._resetTimer) {
         clearTimeout(this._resetTimer);
         this._resetTimer = null;
       }
     } else {
-      // Advance: -1 → 0 → 1 → 2 → ...
-      this.selectedIndex = this.selectedIndex + 1;
+      // Jump to the next entry that's visually distinct (>= 2% further along)
+      const currentPct = this.selectedIndex < 0
+        ? this.todayPct
+        : this.pct(new Date(entries[this.selectedIndex].memoryDate + "T12:00:00"));
+      let next = this.selectedIndex + 1;
+      while (next < count - 1) {
+        const nextPct = this.pct(new Date(entries[next].memoryDate + "T12:00:00"));
+        if (nextPct - currentPct >= 2) break;
+        next++;
+      }
+      this.selectedIndex = next;
       this._startResetTimer();
     }
   }
