@@ -2,10 +2,15 @@ import Service from "@ember/service";
 import { service } from "@ember/service";
 import { tracked } from "@glimmer/tracking";
 
-const MEMORIES_CATEGORY_ID = 53; // The Past
+const MEMORIES_CATEGORY_ID = 53; // The Past (parent)
 const CAPSULES_CATEGORY_ID = 55; // The Future
-const TIMELINE_CATEGORY_ID = 54; // The Present
 const CACHE_TTL = 5 * 60 * 1000; // 5 min
+
+// The Past subcategories — memories live here
+const PAST_SUB_IDS = [61, 62, 63, 64, 65, 66, 67, 68];
+// 61=Holidays 62=Weddings&Funerals 63=Concerts&NightsOut
+// 64=Parties&Celebrations 65=School&GrowingUp 66=Christmas
+// 67=Family Stories 68=Photos&Albums
 
 export default class FvDataService extends Service {
   @service currentUser;
@@ -20,10 +25,10 @@ export default class FvDataService extends Service {
 
   get memoriesCategoryId() { return MEMORIES_CATEGORY_ID; }
   get capsulesCategoryId() { return CAPSULES_CATEGORY_ID; }
-  get timelineCategoryId() { return TIMELINE_CATEGORY_ID; }
 
   get categoryIds() {
-    return [MEMORIES_CATEGORY_ID, CAPSULES_CATEGORY_ID, TIMELINE_CATEGORY_ID];
+    // Scan all Past subcategories + The Future for timeline entries
+    return [...PAST_SUB_IDS, MEMORIES_CATEGORY_ID, CAPSULES_CATEGORY_ID];
   }
 
   csrfToken() {
