@@ -126,7 +126,7 @@ export default class FvTimeline extends Component {
     this._startResetTimer();
   }
 
-  // Single button: cycles today → next visually distinct entry → ... → last → today → repeat
+  // Single button: cycles today → next unique-date entry → ... → last → today → repeat
   @action
   advanceDot() {
     const entries = this.fvData.allEntries;
@@ -140,14 +140,12 @@ export default class FvTimeline extends Component {
         this._resetTimer = null;
       }
     } else {
-      // Jump to the next entry that's visually distinct (>= 2% further along)
-      const currentPct = this.selectedIndex < 0
-        ? this.todayPct
-        : this.pct(new Date(entries[this.selectedIndex].memoryDate + "T12:00:00"));
+      // Skip past any entries that share the same date as the current position
+      const currentDate = this.selectedIndex < 0
+        ? null
+        : entries[this.selectedIndex].memoryDate;
       let next = this.selectedIndex + 1;
-      while (next < count - 1) {
-        const nextPct = this.pct(new Date(entries[next].memoryDate + "T12:00:00"));
-        if (nextPct - currentPct >= 2) break;
+      while (next < count - 1 && entries[next].memoryDate === currentDate) {
         next++;
       }
       this.selectedIndex = next;
