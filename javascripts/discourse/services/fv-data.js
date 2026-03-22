@@ -23,6 +23,12 @@ export default class FvDataService extends Service {
   _cache = null;
   _cacheTime = 0;
 
+  constructor() {
+    super(...arguments);
+    // Expose to head_tag scripts so the modal can invalidate cache
+    window.__fvDataService = this;
+  }
+
   get memoriesCategoryId() { return MEMORIES_CATEGORY_ID; }
   get capsulesCategoryId() { return CAPSULES_CATEGORY_ID; }
 
